@@ -24,10 +24,18 @@ functions:
          path: /products
          cors: true
 
-  productsById:
-    handler: handler.getProductsById
+  productById:
+    handler: handler.getProductById
     events:
      - httpApi:
          method: GET
          path: /products/{id}
          cors: true
+
+  createProduct:
+    handler: handler.createProduct
+    events:
+      - httpApi:
+          method: POST
+          path: /products
+          cors: true
