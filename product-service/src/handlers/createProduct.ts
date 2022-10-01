@@ -15,7 +15,7 @@ const schema = Joi.object({
 const prismaClient = new PrismaClient();
 
 const getProductsList = async (event: APIGatewayProxyEvent) => {
-  const { body } = event;
+  let { body } = event;
 
   console.log('Get products list');
   console.log('Event body: ', body);
@@ -23,7 +23,12 @@ const getProductsList = async (event: APIGatewayProxyEvent) => {
   try {
     if (!body) return createResponse(400, { message: 'Bad request' });
 
-    const { value: validatedData, error } = await schema.validate(body);
+
+    if (typeof body === 'string') {
+      body = JSON.parse(body);
+    }
+
+    const { value: validatedData, error } = schema.validate(body);
 
     if (error) return createResponse(400, error);
 

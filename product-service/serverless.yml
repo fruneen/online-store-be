@@ -1,14 +1,19 @@
 service: product-service
 frameworkVersion: '3'
 
+useDotenv: true
+
 provider:
   name: aws
   runtime: nodejs16.x
   region: eu-central-1
   profile: personal
+  environment:
+    DATABASE_URL: ${env:DATABASE_URL}
 
 plugins:
   - serverless-webpack
+  - serverless-webpack-prisma
 
 custom:
   webpack:
