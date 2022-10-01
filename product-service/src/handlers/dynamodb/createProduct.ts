@@ -1,9 +1,10 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
-import { PrismaClient } from '@prisma/client';
+import { v4 } from 'uuid';
 import Joi from 'joi';
 
 import createResponse from 'helpers/createResponse';
-import formatProduct from '../helpers/formatProduct';
+
+import { createProductRecord, createStockRecord } from './clients/dynamodb-client';
 
 const schema = Joi.object({
   title: Joi.string().required(),
@@ -12,12 +13,10 @@ const schema = Joi.object({
   count: Joi.number().required(),
 });
 
-const prismaClient = new PrismaClient();
-
 const createProduct = async (event: APIGatewayProxyEvent) => {
   let { body } = event;
 
-  console.log('Create product');
+  console.log('Get products list');
   console.log('Event body: ', body);
 
   try {
@@ -32,27 +31,23 @@ const createProduct = async (event: APIGatewayProxyEvent) => {
 
     if (error) return createResponse(400, error);
 
-    return await prismaClient.$transaction(async (prisma) => {
+    const createdProductRecord = await createProductRecord({
+      id:  v4(),
+      title: validatedData.title,
+      description: validatedData.description,
+      price: validatedData.price,
+    });
 
-      const createdProduct = await prisma.product.create({
-        data: {
-          title: validatedData.title,
-          description: validatedData.description,
-          price: validatedData.price,
-          stock: {
-            create: {
-              count: validatedData.count,
-            },
-          },
-        },
-        include: {
-          stock: true,
-        },
-      });
+    if (!createdProductRecord) return createResponse(500, { message: 'Internal server error' });
 
-      const formattedProduct = formatProduct(createdProduct);
+    const createdStockRecord = await createStockRecord({
+      productId: createdProductRecord?.id,
+      count: validatedData.count,
+    });
 
-      return createResponse(201, formattedProduct);
+    return createResponse(200, {
+      ...createdProductRecord,
+      count: createdStockRecord.count,
     });
 
   } catch (error) {

@@ -15,6 +15,7 @@
     "@serverless/typescript": "^3.19.0",
     "@types/aws-lambda": "^8.10.100",
     "@types/jest": "^28.1.1",
+    "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
     "babel-loader": "^8.2.5",
@@ -36,7 +37,9 @@
   },
   "dependencies": {
     "@prisma/client": "^3.15.2",
+    "aws-sdk": "^2.1227.0",
     "joi": "^17.6.0",
-    "prisma": "^3.15.2"
+    "prisma": "^3.15.2",
+    "uuid": "^9.0.0"
   }
 }
