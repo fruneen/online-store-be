@@ -1,6 +1,6 @@
 import { APIGatewayProxyEvent } from 'aws-lambda';
-import Joi from 'joi';
 import { PrismaClient } from '@prisma/client';
+import Joi from 'joi';
 
 import createResponse from 'helpers/createResponse';
 import formatProduct from '../helpers/formatProduct';

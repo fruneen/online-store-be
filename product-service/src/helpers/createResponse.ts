@@ -1,4 +1,4 @@
-const createResponse = (statusCode: number, message: any) => ({
+const createResponse = (statusCode: number, message: unknown) => ({
   statusCode,
   headers: {
     'Access-Control-Allow-Origin': '*',
