@@ -3,6 +3,7 @@ import csv  from 'csv-parser';
 
 import createResponse from 'helpers/createResponse';
 import s3Client from 'services/storage.service';
+import sqsClient from 'services/queue.service';
 
 const importFileParser = async (event: S3Event) => {
   try {
@@ -22,7 +23,7 @@ const importFileParser = async (event: S3Event) => {
         Key: key,
       }).createReadStream().pipe(csv());
 
-      const readFile = () => new Promise<void>(function (resolve, reject) {
+      const readFile = () => new Promise<void>( async (resolve, reject) =>  {
         s3Stream
           .on('error', () => {
             console.log('Error reading file');
@@ -30,6 +31,14 @@ const importFileParser = async (event: S3Event) => {
           })
           .on('data', (data) => {
             console.log(data);
+
+            sqsClient.sendMessage(
+              {
+                QueueUrl: process.env.SQS_URL || '',
+                MessageBody: JSON.stringify(data),
+              },
+              () => { console.log('Message sent'); },
+            );
           })
           .on('end', () => {
             console.log(`Finished processing file ${record.object.key}`);
