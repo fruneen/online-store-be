@@ -1,5 +1,5 @@
-import csv  from 'csv-parser';
 import { S3Event } from 'aws-lambda';
+import csv  from 'csv-parser';
 
 import createResponse from 'helpers/createResponse';
 import s3Client from 'services/storage.service';
