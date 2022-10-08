@@ -18,8 +18,6 @@ const catalogBatchProcess = async (event: SQSEvent) => {
   try {
     const records = event.Records;
 
-    console.log(event.Records);
-
     await Promise.all(records.map(async (record) => {
       const { body } = record;
 
@@ -66,6 +64,8 @@ const catalogBatchProcess = async (event: SQSEvent) => {
         () => { console.log('Email sent'); },
       ).promise();
     }));
+
+    return { statusCode: 200 };
   } catch (error) {
     console.log(error);
     return createResponse(500, error);

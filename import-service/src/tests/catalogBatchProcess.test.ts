@@ -3,12 +3,12 @@ import * as handler from '../../handler';
 const event = {
   Records: [
     {
-      body: {
+      body: JSON.stringify({
         title: 'Test',
         description: 'Test',
         price: 1,
         count: 1,
-      },
+      }),
     },
   ],
 };
