@@ -1,14 +1,19 @@
 service: product-service
 frameworkVersion: '3'
 
+useDotenv: true
+
 provider:
   name: aws
   runtime: nodejs16.x
   region: eu-central-1
   profile: personal
+  environment:
+    DATABASE_URL: ${env:DATABASE_URL}
 
 plugins:
   - serverless-webpack
+  - serverless-webpack-prisma
 
 custom:
   webpack:
@@ -24,10 +29,18 @@ functions:
          path: /products
          cors: true
 
-  productsById:
-    handler: handler.getProductsById
+  productById:
+    handler: handler.getProductById
     events:
      - httpApi:
          method: GET
          path: /products/{id}
          cors: true
+
+  createProduct:
+    handler: handler.createProduct
+    events:
+      - httpApi:
+          method: POST
+          path: /products
+          cors: true

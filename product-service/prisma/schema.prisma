@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
+  binaryTargets = ["rhel-openssl-1.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          String    @id @default(uuid())
+  title       String
+  description String
+  price       Int
+  stock       Stock?
+}
+
+model Stock {
+  product   Product @relation(fields: [productId], references: [id])
+  productId String @unique
+  count     Int
+}

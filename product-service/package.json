@@ -1,5 +1,10 @@
 {
   "scripts": {
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "lambda:products": "sls invoke local --function products",
+    "lambda:productById": "sls invoke local --function productById --data '{ \"pathParameters\": {\"id\":\"32d756c8-5f02-41d0-b3ea-6fcc4e2878b8\"}}'",
+    "lambda:createProduct": "sls invoke local --function createProduct --data '{ \"body\": {\"title\":\"Test Product\",\"description\":\"Test Product Description\",\"price\":\"10.00\", \"count\":\"10\"}}'",
     "test": "jest"
   },
   "devDependencies": {
@@ -10,6 +15,7 @@
     "@serverless/typescript": "^3.19.0",
     "@types/aws-lambda": "^8.10.100",
     "@types/jest": "^28.1.1",
+    "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
     "babel-loader": "^8.2.5",
@@ -20,6 +26,7 @@
     "eslint-plugin-import": "^2.26.0",
     "jest": "^28.1.1",
     "serverless-webpack": "^5.7.1",
+    "serverless-webpack-prisma": "^1.1.0",
     "source-map-support": "^0.5.21",
     "ts-jest": "^28.0.4",
     "ts-loader": "^9.3.0",
@@ -27,5 +34,12 @@
     "webpack": "^5.73.0",
     "webpack-cli": "^4.9.2",
     "webpack-node-externals": "^3.0.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^3.15.2",
+    "aws-sdk": "^2.1227.0",
+    "joi": "^17.6.0",
+    "prisma": "^3.15.2",
+    "uuid": "^9.0.0"
   }
 }
