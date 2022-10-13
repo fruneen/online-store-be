@@ -1,0 +1,46 @@
+service: import-service
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: eu-central-1
+  profile: personal
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action: s3:ListBucket
+      Resource:
+      - arn:aws:s3:::node-in-aws-import-service
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource:
+        - arn:aws:s3:::node-in-aws-import-service/*
+
+plugins:
+  - serverless-webpack
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+
+functions:
+  importProductsFile:
+    handler: handler.importProductsFile
+    events:
+     - httpApi:
+         method: GET
+         path: /import
+         cors: true
+
+  importFileParser:
+    handler: handler.importFileParser
+    events:
+      - s3:
+          bucket: node-in-aws-import-service
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploaded/
+          existing: true
