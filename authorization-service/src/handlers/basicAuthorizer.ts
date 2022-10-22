@@ -22,8 +22,6 @@ const basicAuthorizer: APIGatewayRequestIAMAuthorizerHandlerV2 = (event, context
     const [username, password] = plainCreds;
     console.log(`Username: ${username}, password: ${password}`);
 
-    console.log(process.env);
-
     const storedUserPassword = process.env[username];
 
     const effect = !storedUserPassword || storedUserPassword !== password ? 'Deny' : 'Allow';
