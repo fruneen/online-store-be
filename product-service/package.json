@@ -7,6 +7,13 @@
     "lambda:createProduct": "sls invoke local --function createProduct --data '{ \"body\": {\"title\":\"Test Product\",\"description\":\"Test Product Description\",\"price\":\"10.00\", \"count\":\"10\"}}'",
     "test": "jest"
   },
+  "dependencies": {
+    "@prisma/client": "^3.15.2",
+    "aws-sdk": "^2.1227.0",
+    "joi": "^17.6.0",
+    "prisma": "^3.15.2",
+    "uuid": "^9.0.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.18.2",
     "@babel/plugin-transform-typescript": "^7.18.4",
@@ -34,12 +41,5 @@
     "webpack": "^5.73.0",
     "webpack-cli": "^4.9.2",
     "webpack-node-externals": "^3.0.0"
-  },
-  "dependencies": {
-    "@prisma/client": "^3.15.2",
-    "aws-sdk": "^2.1227.0",
-    "joi": "^17.6.0",
-    "prisma": "^3.15.2",
-    "uuid": "^9.0.0"
   }
 }

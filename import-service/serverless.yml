@@ -1,11 +1,19 @@
 service: import-service
 frameworkVersion: '3'
 
+useDotenv: true
+
 provider:
   name: aws
   runtime: nodejs16.x
   region: eu-central-1
   profile: personal
+  environment:
+    DATABASE_URL: ${env:DATABASE_URL}
+    SQS_URL:
+      Ref: catalogItemsQueue
+    SNS_ARN:
+      Ref: createProductTopic
 
   iamRoleStatements:
     - Effect: Allow
@@ -17,14 +25,56 @@ provider:
         - s3:*
       Resource:
         - arn:aws:s3:::node-in-aws-import-service/*
+    - Effect: Allow
+      Action:
+        - sqs:*
+      Resource:
+        - arn:aws:sqs:eu-central-1:688730865701:catalogItemsQueue
+    - Effect: Allow
+      Action:
+        - sns:*
+      Resource:
+        - arn:aws:sns:eu-central-1:688730865701:createProductTopic
 
 plugins:
   - serverless-webpack
+  - serverless-webpack-prisma
 
 custom:
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
+
+resources:
+  Resources:
+    catalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+    createProductTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+    SNSHighPricingSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Protocol: email
+        Endpoint: fruneen+high-pricing@gmail.com
+        TopicArn:
+          Ref: createProductTopic
+        FilterPolicy:
+          pricingCategory:
+            - High
+    SNSLowPricingSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Protocol: email
+        Endpoint: fruneen+low-pricing@gmail.com
+        TopicArn:
+          Ref: createProductTopic
+        FilterPolicy:
+          pricingCategory:
+              - Low
 
 functions:
   importProductsFile:
@@ -44,3 +94,10 @@ functions:
           rules:
             - prefix: uploaded/
           existing: true
+
+  catalogBatchProcess:
+    handler: handler.catalogBatchProcess
+    events:
+      - sqs:
+          arn: arn:aws:sqs:eu-central-1:688730865701:catalogItemsQueue
+          batchSize: 5
