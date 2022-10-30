@@ -36,6 +36,15 @@ provider:
       Resource:
         - arn:aws:sns:eu-central-1:688730865701:createProductTopic
 
+  httpApi:
+    authorizers:
+      basicAuthorizer:
+        name: basicAuthorizer
+        identitySource: $request.header.Authorization
+        resultTtlInSeconds: 0
+        functionArn: arn:aws:lambda:eu-central-1:688730865701:function:authorization-service-dev-basicAuthorizer
+        type: request
+
 plugins:
   - serverless-webpack
   - serverless-webpack-prisma
@@ -84,6 +93,8 @@ functions:
          method: GET
          path: /import
          cors: true
+         authorizer:
+           name: basicAuthorizer
 
   importFileParser:
     handler: handler.importFileParser

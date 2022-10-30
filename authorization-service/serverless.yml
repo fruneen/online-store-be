@@ -1,0 +1,18 @@
+service: authorization-service
+frameworkVersion: '3'
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: eu-central-1
+  profile: personal
+
+plugins:
+  - serverless-webpack
+  - serverless-dotenv-plugin
+
+functions:
+  basicAuthorizer:
+    handler: handler.basicAuthorizer
