@@ -6,7 +6,7 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import axios from 'axios';
+import { Axios } from 'axios';
 import { Cache } from 'cache-manager';
 import { isEmpty } from 'lodash';
 import { Request, Response } from 'express';
@@ -71,15 +71,26 @@ export class RedirectController {
         const axiosConfig = {
           method: req.method,
           url: `${recipientURL}${query}`,
-          ...(!isEmpty(req.body) && { data: req.body }),
+          ...(req.headers.authorization && {
+            headers: {
+              Authorization: req.headers.authorization,
+            },
+          }),
+          ...(!isEmpty(req.body) && {
+            data: req.body,
+          }),
         };
 
         console.log('Axios config', axiosConfig);
+        const axiosService = new Axios(axiosConfig);
 
-        const { data } = await axios(axiosConfig);
+        const { data } = await axiosService.request(axiosConfig);
+        const parsedResponse = JSON.parse(data);
 
-        this.cacheManager.set(key, data, { ttl: CACHE_TIME });
-        res.json(data);
+        const responseData = parsedResponse.data || parsedResponse;
+        this.cacheManager.set(key, responseData, { ttl: CACHE_TIME });
+
+        res.status(parsedResponse.statusCode).json(responseData);
       } catch (error) {
         console.log(error);
 

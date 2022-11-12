@@ -4,7 +4,7 @@ import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 4001;
 
 const bootstrap = async () => {
   const app = await NestFactory.create(AppModule);
