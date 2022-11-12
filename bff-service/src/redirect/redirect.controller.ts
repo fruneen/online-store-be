@@ -71,26 +71,27 @@ export class RedirectController {
         const axiosConfig = {
           method: req.method,
           url: `${recipientURL}${query}`,
-          ...(req.headers.authorization && {
-            headers: {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(req.headers.authorization && {
               Authorization: req.headers.authorization,
-            },
-          }),
+            }),
+          },
           ...(!isEmpty(req.body) && {
-            data: req.body,
+            data: JSON.stringify(req.body),
           }),
         };
 
         console.log('Axios config', axiosConfig);
         const axiosService = new Axios(axiosConfig);
 
-        const { data } = await axiosService.request(axiosConfig);
+        const { data, status } = await axiosService.request(axiosConfig);
         const parsedResponse = JSON.parse(data);
 
         const responseData = parsedResponse.data || parsedResponse;
         this.cacheManager.set(key, responseData, { ttl: CACHE_TIME });
 
-        res.status(parsedResponse.statusCode).json(responseData);
+        res.status(status).json(responseData);
       } catch (error) {
         console.log(error);
 
