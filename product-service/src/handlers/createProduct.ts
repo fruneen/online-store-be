@@ -4,12 +4,14 @@ import Joi from 'joi';
 
 import createResponse from 'helpers/createResponse';
 import formatProduct from '../helpers/formatProduct';
+import { isBase64 } from '../helpers/isBase64';
 
 const schema = Joi.object({
   title: Joi.string().required(),
   description: Joi.string().required(),
   price: Joi.number().required(),
   count: Joi.number().required(),
+  photoUrl: Joi.string().required(),
 });
 
 const prismaClient = new PrismaClient();
@@ -25,6 +27,10 @@ const createProduct = async (event: APIGatewayProxyEvent) => {
 
 
     if (typeof body === 'string') {
+      if (isBase64(body)) {
+        body = Buffer.from(body, 'base64').toString();
+      }
+
       body = JSON.parse(body);
     }
 
@@ -39,6 +45,7 @@ const createProduct = async (event: APIGatewayProxyEvent) => {
           title: validatedData.title,
           description: validatedData.description,
           price: validatedData.price,
+          photoUrl: validatedData.photoUrl,
           stock: {
             create: {
               count: validatedData.count,
