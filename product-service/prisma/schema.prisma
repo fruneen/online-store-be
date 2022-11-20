@@ -1,7 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["interactiveTransactions"]
-  binaryTargets = ["rhel-openssl-1.0.x", "darwin-arm64"]
+  binaryTargets   = ["rhel-openssl-1.0.x", "darwin-arm64", "linux-musl"]
 }
 
 datasource db {
@@ -9,16 +9,65 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id       String  @id @default(uuid())
+  name     String
+  password String
+  Cart     Cart[]
+  Order    Order[]
+}
+
 model Product {
-  id          String    @id @default(uuid())
+  id          String     @id @default(uuid())
   title       String
   description String
   price       Int
   stock       Stock?
+  photoUrl    String
+  CartItem    CartItem[]
 }
 
 model Stock {
   product   Product @relation(fields: [productId], references: [id])
-  productId String @unique
+  productId String  @unique
   count     Int
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  user      User       @relation(fields: [userId], references: [id])
+  userId    String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  CartItem  CartItem[]
+  Order     Order[]
+}
+
+model CartItem {
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  cartId    String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  count     Int
+  Order     Order?  @relation(fields: [orderId], references: [id])
+  orderId   String?
+
+  @@unique([cartId, productId])
+}
+
+model Order {
+  id        String     @id @default(uuid())
+  status    String     @default("inProgress")
+  user      User       @relation(fields: [userId], references: [id])
+  userId    String
+  cart      Cart       @relation(fields: [cartId], references: [id])
+  cartId    String
+  total     Int
+  items     Json
+  payment   Json?
+  delivery  Json?
+  comments  String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  CartItem  CartItem[]
 }
